@@ -11,4 +11,4 @@ let User = mongoose.model('Users', {
 
 module.exports = {
   User
-}
+  }
