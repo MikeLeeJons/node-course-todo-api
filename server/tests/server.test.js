@@ -1,5 +1,8 @@
 const expect = require('expect');
 const request = require('supertest');
+const {
+  ObjectID
+} = require('mongodb');
 
 const {
   app
@@ -7,6 +10,10 @@ const {
 const {
   Todo
 } = require('./../models/todo');
+
+const Todos = {
+  _id: new ObjectID()
+}
 
 beforeEach((done) => {
   Todo.remove({}).then(() => done())
@@ -55,3 +62,13 @@ describe('POST /todos', () => {
       });
   });
 })
+
+//TEST are not ready yet
+// describe('GET /todos/:id', () => {
+//   it('should return todo doc', (done) => {
+//     request()
+//       .get(`todos/${Todos._id.toHexString()}`)
+//       .expect(200)
+//       .
+//   });
+// });
