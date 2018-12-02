@@ -1,3 +1,5 @@
+require('./config/config');
+
 let express = require('express');
 let _ = require('lodash');
 let bodyParser = require('body-parser');
@@ -13,7 +15,7 @@ let {
   User
 } = require('./models/user');
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT;
 
 let app = express();
 
