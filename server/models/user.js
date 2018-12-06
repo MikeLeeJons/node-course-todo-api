@@ -45,7 +45,7 @@ UserSchema.methods.generateAuthToken = function () {
   let token = jwt.sign({
     _id: user._id.toHexString(),
     access
-  }, 'liza').toString()
+  }, 'mike').toString()
 
   user.tokens = user.tokens.concat([{
     access,
@@ -54,6 +54,23 @@ UserSchema.methods.generateAuthToken = function () {
 
   return user.save().then(() => {
     return token
+  })
+}
+
+UserSchema.statics.findByToken = function (token) {
+  let User = this;
+  let decoded;
+
+  try {
+    decoded = jwt.verify(token, 'mike');
+  } catch (e) {
+    return Promise.reject()
+  }
+
+  return User.findOne({
+    '_id': decoded._id,
+    'tokens.token': token,
+    'tokens.access': 'auth'
   })
 }
 
