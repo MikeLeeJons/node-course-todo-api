@@ -308,3 +308,25 @@ describe('POST /users/login', () => {
       .end(done)
   })
 })
+
+describe('DELETE /users/me/token', () => {
+  it('should remove auth token and logout', (done) => {
+    let userOne = users[0]
+    request(app)
+      .del('/users/me/token')
+      .set('x-auth', userOne.tokens[0].token)
+
+      .expect(200)
+      .end((err, res) => {
+        if (err) {
+          return done(err)
+        }
+
+        User.findById(userOne._id).then(user => {
+          expect(user.tokens.length).toBe(0)
+          done()
+        }).catch(e => done(e))
+      })
+
+  })
+})
