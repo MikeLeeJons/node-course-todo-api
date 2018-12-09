@@ -13,7 +13,7 @@ let UserSchema = new mongoose.Schema({
     unique: true,
     validate: {
       validator: validator.isEmail,
-      message: '{VALUES} is not a valid email'
+      message: '{VALUE} is not a valid email'
     }
   },
   password: {
@@ -31,13 +31,13 @@ let UserSchema = new mongoose.Schema({
       required: true
     }
   }]
-});
+})
 
 UserSchema.methods.toJSON = function () {
   let user = this;
-  let userObject = user.toObject()
+  let userObject = user.toObject();
 
-  return _.pick(userObject, ['_id', 'email'])
+  return _.pick(userObject, ['email', '_id'])
 }
 
 UserSchema.methods.generateAuthToken = function () {
@@ -59,37 +59,39 @@ UserSchema.methods.generateAuthToken = function () {
 }
 
 UserSchema.statics.findByToken = function (token) {
-  let User = this;
+  let User = this
   let decoded;
 
   try {
-    decoded = jwt.verify(token, 'mike');
-  } catch (e) {
+    decoded = jwt.verify(token, 'mike')
+  } catch (error) {
     return Promise.reject()
   }
 
   return User.findOne({
     '_id': decoded._id,
-    'tokens.token': token,
-    'tokens.access': 'auth'
+    'tokens.access': 'auth',
+    'tokens.token': token
   })
 }
 
 UserSchema.pre('save', function (next) {
-  let user = this;
-  let password = user.password
+  let user = this
+
   if (user.isModified('password')) {
     bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(password, salt, (err, hash) => {
-        user.password = hash
+      bcrypt.hash(user.password, salt, (err, res) => {
+        user.password = res
         next()
       })
-    })
-  }
 
+    })
+  } else {
+    next()
+  }
 })
 
-let User = mongoose.model('Users', UserSchema)
+let User = mongoose.model('User', UserSchema);
 
 module.exports = {
   User
