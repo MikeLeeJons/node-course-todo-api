@@ -16,9 +16,9 @@ let {
 let {
   User
 } = require('./models/user');
-// let {
-//   authenticate
-// } = require('./middleware/authenticate');
+let {
+  authenticate
+} = require('./middleware/authenticate');
 
 
 let app = express();
@@ -135,20 +135,17 @@ app.post('/users', (req, res) => {
   })
 })
 
-let authenticate = (req, res, next) => {
-  let token = req.header('x-auth')
+app.post('/users/login', (req, res) => {
+  let body = _.pick(req.body, ['email', 'password'])
 
-  User.findByToken(token).then((user) => {
-    if (!user) {
-      return Promise.reject()
-    }
-    req.user = user;
-    req.token = token;
-    next()
-  }).catch((e) => {
-    res.status(401).send()
+  User.findByCredentials(body.email, body.password).then((user) => {
+    return user.generateAuthToken().then((token) => {
+      res.header('x-auth', token).send(user)
+    })
+  }).catch(e => {
+    res.status(400).send()
   })
-}
+})
 
 app.get('/users/me', authenticate, (req, res) => {
   res.send(req.user)
